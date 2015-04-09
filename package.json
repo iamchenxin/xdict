@@ -2,8 +2,8 @@
   "name": "xdict",
   "title": "xdict",
   "id": "jid1-HdKJRhNJgbAPqw",
-  "description": "a basic add-on",
-  "author": "",
+  "description": "a dict plugin",
+  "author": "iamchenxin",
   "license": "MPL 2.0",
   "version": "0.1"
 }
