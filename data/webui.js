@@ -48,27 +48,121 @@ function newui(){
     });
     jQuery(".ui-dialog").css("pointer-events","auto");
 
-    jQuery('#xxc_search_d').click(function(){
-        var pageid ="en:";
-        var word = jQuery("#xxc_pageid_in").val().trim();
-        pageid+=word;
-        self.port.emit("getpage",pageid);
-        console.log("webui! xxc_search_d(),emit(getpage),pageid = "+pageid);
+    jQuery('#xxc_search_d').click(do_search);
 
-        self.port.on("revpage",function(txt){
-            var logtxt = "webui! received txt,port.on(revpage)";
+}
 
-            if(txt.length<10){
-                txt='<div>Missing word ...</div>';
-                logtxt+=",Missing word!";
-            }
-            console.log(logtxt);
-            jQuery("#xxc_dict_out").html(txt);
-        });
+function do_search(){
+    var pageid ="en:";
+    var word = jQuery("#xxc_pageid_in").val().trim();
+    pageid+=word;
+    jQuery('#xxc_checkset label.ui-state-active').each(function(){
+        var dst=jQuery(this).text();
+        console.log(dst);
+        switch(dst){
+            case 'page':
+                wgetpage(pageid);
+                break;
+            case 'voice':
+                voice_dict(word);
+                break;
+        }
+    });
 
+}
+
+function wgetpage(pageid){
+
+    self.port.emit("getpage",pageid);
+    console.log("webui! xxc_search_d(),emit(getpage),pageid = "+pageid);
+
+    self.port.on("revpage",function(txt){
+        var logtxt = "webui! received txt,port.on(revpage)";
+
+        if(txt.length<10){
+            txt='<div>Missing word ...</div>';
+            logtxt+=",Missing word!";
+        }
+        console.log(logtxt);
+        jQuery("#xxc_dict_out").html(txt);
     });
 }
 
+// voice ~~~~~
+function init_mxyd_voice(){
+
+    jx = jQuery('<audio/>', { id: 'adyd_vo', class: 'admxyd_vo'});
+
+//    jx.attr('onerror',"voice_youdao_helper()");
+
+    jogg=jQuery("<source id='adsrcogg'  type='audio/ogg'/>");
+//    jogg.attr('onerror',"voice_youdao_helper()");
+    jogg.appendTo(jx);
+
+    jmp3 = jQuery("<source id='adsrcmp3' type='audio/mpeg'/>");
+    jmp3.appendTo(jx);
+
+    jQuery("body").append(jx);
+
+}
+
+function voice_you_word(word){
+    var str="http://dict.youdao.com/dictvoice?audio=";
+    str+=word;
+    str+="&type=1";
+    mvoice = jQuery("#adyd_vo")[0];
+    mvoice.setAttribute('onerror',"");
+    mvoice.setAttribute('src', str);
+    mvoice.setAttribute('autoplay', 'autoplay');
+}
 
 
-newui();
+var faildword="";
+
+
+function voice_youdao_helper(){
+    var str="http://dict.youdao.com/dictvoice?audio=";
+    str += faildword;
+
+    str+="&type=1";
+    mvoice = jQuery("#adyd_vo")[0];
+    mvoice.setAttribute('onerror',"");
+    mvoice.setAttribute('src', str);
+    mvoice.setAttribute('autoplay', 'autoplay');
+    mvoice.play();
+    // mvoice.play() ! this could lend ie  interupt!
+//    mvoice.setAttribute('src', '');
+
+}
+
+function voice_dict(word){
+    var str="http://dict.qituc.com/dv/";
+    var xword =word;
+    var sckey = jQuery.cookie("DWremoteinf");
+
+    if(sckey==null){
+        voice_you_word("please login.This function only available to users.");
+        return;
+    }
+
+    str+=sckey;
+    str+="|";
+    str += xword;
+    jx = jQuery("#adyd_vo");
+    jx.removeAttr("src");
+
+    jQuery("#adsrcogg").attr("src",str+".ogg");
+    jQuery("#adsrcogg").attr('onerror',"voice_you_word('missing word,please record it to the missing words file.')");
+    jQuery("#adsrcmp3").attr("src",str+".mp3");
+    jx.attr('onerror',"voice_you_word('missing word,please record it to the missing words file.')");
+    jx[0].pause();
+    jx[0].load();
+    jx[0].play();
+}
+
+function init(){
+    newui();
+    init_mxyd_voice();
+}
+
+init();
