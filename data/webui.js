@@ -29,7 +29,6 @@ function newui(){
     <button id="xxc_search_d">Search</button>\
     <div id="xxc_checkset">\
     <input type="checkbox" id="xxc_page_ck"><label for="xxc_page_ck">page</label>\
-    <input type="checkbox" id="xxc_content_ck"><label for="xxc_content_ck">content</label>\
     <input type="checkbox" id="xxc_voice_ck"><label for="xxc_voice_ck">voice</label>\
     </div>\
     <input type="input" id="xxc_pageid_in">\
@@ -64,7 +63,7 @@ function do_search(){
                 wgetpage(pageid);
                 break;
             case 'voice':
-                voice_dict(word);
+                self.port.emit("voiceword",word);
                 break;
         }
     });
@@ -88,6 +87,7 @@ function wgetpage(pageid){
     });
 }
 
+/*
 // voice ~~~~~
 function init_mxyd_voice(){
 
@@ -159,10 +159,11 @@ function voice_dict(word){
     jx[0].load();
     jx[0].play();
 }
+*/
 
 function init(){
     newui();
-    init_mxyd_voice();
+//    init_mxyd_voice();
 }
 
 init();

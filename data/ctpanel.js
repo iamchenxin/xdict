@@ -7,7 +7,9 @@ function testget(){
 
 }
 
-
+function outuser(txt){
+    console.log(txt);
+}
 
 function init(){
     jQuery( "#menu" ).menu();
@@ -19,9 +21,7 @@ function init(){
                 break;
             case "getuser":
                 self.port.emit("getuser");
-                self.port.on("revuser",function(txt){
-                    console.log(txt);
-                });
+                console.log("ctpanel.getuser");
                 break;
             case "cook":
                 self.port.emit("cook");
@@ -31,6 +31,7 @@ function init(){
                 break;
         }
     } );
+    self.port.on("revuser",outuser);
 }
 
 jQuery(init);
